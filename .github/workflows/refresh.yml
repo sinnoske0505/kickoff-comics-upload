@@ -1,0 +1,14 @@
+name: 토큰 연장
+on:
+  schedule:
+    - cron: "0 3 1,15 * *"   # 매월 1일·15일
+  workflow_dispatch:
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 인스타 토큰 연장
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          curl -s "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${IG_TOKEN}" | python3 -c "import sys,json;d=json.load(sys.stdin);print('남은 기간(초):',d.get('expires_in'),d.get('error',''))"
