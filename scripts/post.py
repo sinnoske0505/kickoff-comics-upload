@@ -174,12 +174,38 @@ def alt_texts(folder, imgs, caption):
     return [(alts[i] if i < len(alts) else alts[-1])[:1000] for i in range(len(imgs))]
 
 
-def make_child(uid, image_url, alt):
-    try:
-        return call("POST", f"{uid}/media", image_url=image_url, is_carousel_item="true", alt_text=alt)["id"]
-    except ApiError:
-        print("대체 텍스트 없이 다시 시도")
-        return call("POST", f"{uid}/media", image_url=image_url, is_carousel_item="true")["id"]
+SHA = os.environ.get("GITHUB_SHA", BRANCH)
+HOSTS = [
+    lambda p: f"https://cdn.jsdelivr.net/gh/{REPO}@{SHA}/{p}",
+    lambda p: f"https://raw.githubusercontent.com/{REPO}/{SHA}/{p}",
+]
+
+
+def with_hosts(fn, path):
+    """이미지 주소를 jsDelivr → GitHub raw 순서로 시도. 인스타가 한쪽에서 못 받아가면 다른 쪽으로."""
+    last = None
+    for h in HOSTS:
+        try:
+            return fn(h(path))
+        except ApiError as e:
+            last = e
+            if "2207052" not in str(e) and "media" not in str(e).lower():
+                raise
+            print("이미지 주소 바꿔서 다시 시도")
+            time.sleep(5)
+    raise last
+
+
+def make_child(uid, path, alt):
+    def go(u):
+        try:
+            return call("POST", f"{uid}/media", image_url=u, is_carousel_item="true", alt_text=alt)["id"]
+        except ApiError as e:
+            if "2207052" in str(e):
+                raise
+            print("대체 텍스트 없이 다시 시도")
+            return call("POST", f"{uid}/media", image_url=u, is_carousel_item="true")["id"]
+    return with_hosts(go, path)
 
 
 def make_parent(uid, collab, **params):
@@ -191,9 +217,9 @@ def make_parent(uid, collab, **params):
     return call("POST", f"{uid}/media", **params)["id"]
 
 
-def share_story(uid, image_url):
+def share_story(uid, path):
     try:
-        c = call("POST", f"{uid}/media", image_url=image_url, media_type="STORIES")["id"]
+        c = with_hosts(lambda u: call("POST", f"{uid}/media", image_url=u, media_type="STORIES")["id"], path)
         wait_ready(c)
         call("POST", f"{uid}/media_publish", creation_id=c)
         return True
@@ -202,10 +228,10 @@ def share_story(uid, image_url):
         return False
 
 
-def share_stories(uid, urls):
+def share_stories(uid, paths):
     """장면별 스토리를 순서대로 올림. 하나라도 실패하면 거기서 멈춤."""
     n = 0
-    for u in urls:
+    for u in paths:
         if not share_story(uid, u):
             break
         n += 1
@@ -223,15 +249,15 @@ def publish(folder):
         collab = [l.strip().lstrip("@") for l in open(f"{folder}/collab.txt", encoding="utf-8") if l.strip()][:3]
     me = call("GET", "me", fields="user_id,username")
     uid = me["user_id"]; print("계정:", me.get("username"))
-    url = lambda p: f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/{p}"
+    url = HOSTS[0]
     alts = alt_texts(folder, imgs, caption)
 
     if len(imgs) == 1:
-        c = make_parent(uid, collab, image_url=url(imgs[0]), caption=caption, is_ai_generated="true", alt_text=alts[0])
+        c = make_parent(uid, collab, image_url=HOSTS[0](imgs[0]), caption=caption, is_ai_generated="true", alt_text=alts[0])
     else:
         kids = []
         for p, a in zip(imgs, alts):
-            k = make_child(uid, url(p), a)
+            k = make_child(uid, p, a)
             wait_ready(k); kids.append(k)
         c = make_parent(uid, collab, media_type="CAROUSEL", children=",".join(kids), caption=caption, is_ai_generated="true")
     wait_ready(c)
@@ -249,9 +275,9 @@ def publish(folder):
         notes.append("첫 댓글 완료")
     except Exception as e:
         notes.append(f"첫 댓글 실패: {str(e)[:120]}")
-    story_urls = [url(p) for p in stories] or [url(imgs[0])]
-    n = share_stories(uid, story_urls)
-    notes.append(f"스토리 {n}/{len(story_urls)}장 완료" if n else "스토리 건너뜀")
+    story_paths = stories or [imgs[0]]
+    n = share_stories(uid, story_paths)
+    notes.append(f"스토리 {n}/{len(story_paths)}장 완료" if n else "스토리 건너뜀")
     with open(f"{folder}/posted.txt", "a") as f:
         f.write("# " + " / ".join(notes) + "\n")
     print(" / ".join(notes))
