@@ -6,6 +6,8 @@ posts/<폴더>/ 안에
   post_at.txt           (선택) 한국시간 'YYYY-MM-DD HH:MM'
   alt.txt               (선택) 이미지별 대체 텍스트, 한 줄에 하나
   collab.txt            (선택) 공동 게시 초대할 계정 아이디, 한 줄에 하나 (최대 3)
+  reel.mp4              (릴스일 때) 이 파일이 있으면 사진 대신 릴스로 올림. 음악은 영상에 미리 넣기
+  cover_ms.txt          (선택, 릴스) 표지로 쓸 장면 위치(밀리초). 기본 1200 = 제목 화면
 아직 안 올라간 폴더 중 시간이 된 것을 올리고 posted.txt 를 남긴다.
 
 매 게시마다 자동으로:
@@ -47,8 +49,8 @@ def call(method, path, **params):
         raise ApiError(body)
 
 
-def wait_ready(cid):
-    for _ in range(30):
+def wait_ready(cid, tries=30):
+    for _ in range(tries):
         s = call("GET", cid, fields="status_code").get("status_code")
         if s == "FINISHED":
             return
@@ -113,8 +115,8 @@ def last_posted(exclude):
         if folder == exclude:
             continue
         line = open(f, encoding="utf-8").read().split("\n")[0].split()
-        if len(line) < 3:
-            continue
+        if len(line) < 3 or "type=reel" in line:
+            continue  # 릴스에는 투표가 없으니 집계 대상에서 빼기
         stamp = " ".join(line[:2])
         media_id = next((x[3:] for x in line if x.startswith("id=")), None)
         if media_id and (best is None or stamp > best[0]):
@@ -239,7 +241,41 @@ def share_stories(uid, paths):
     return n
 
 
+REEL_COMMENT = "📖 Full 4-panel comic + MOTM vote are on our feed. Tap @kick_off_comics 👆"
+
+
+def publish_reel(folder):
+    """reel.mp4 가 있는 폴더 = 릴스. 음악은 영상 파일 안에 미리 넣어 둠 (API로는 인스타 음악을 못 붙임)."""
+    caption = clean_caption(open(f"{folder}/caption.txt", encoding="utf-8").read())
+    me = call("GET", "me", fields="user_id,username")
+    uid = me["user_id"]; print("계정:", me.get("username"))
+    cover_ms = 1200
+    if os.path.exists(f"{folder}/cover_ms.txt"):
+        cover_ms = int(open(f"{folder}/cover_ms.txt").read().strip())
+
+    def go(u):
+        return call("POST", f"{uid}/media", media_type="REELS", video_url=u, caption=caption,
+                    share_to_feed="true", thumb_offset=str(cover_ms), is_ai_generated="true")["id"]
+    c = with_hosts(go, f"{folder}/reel.mp4")
+    wait_ready(c, tries=60)   # 영상 처리는 최대 10분까지 기다림
+    res = call("POST", f"{uid}/media_publish", creation_id=c)
+    mid = res["id"]
+    link = call("GET", mid, fields="permalink").get("permalink", "")
+    open(f"{folder}/posted.txt", "w").write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} {link} id={mid} type=reel\n")
+    print("릴스 게시 완료:", link)
+    try:
+        call("POST", f"{mid}/comments", message=REEL_COMMENT)
+        note = "첫 댓글 완료"
+    except Exception as e:
+        note = f"첫 댓글 실패: {str(e)[:120]}"
+    with open(f"{folder}/posted.txt", "a") as f:
+        f.write("# " + note + "\n")
+    print(note)
+
+
 def publish(folder):
+    if os.path.exists(f"{folder}/reel.mp4"):
+        return publish_reel(folder)
     imgs = sorted([p for p in glob.glob(f"{folder}/*.jpg") if os.path.basename(p).split(".")[0].isdigit()],
                   key=lambda p: int(os.path.basename(p).split(".")[0]))
     stories = sorted(glob.glob(f"{folder}/story_*.jpg"), key=lambda p: int(re.findall(r"\d+", os.path.basename(p))[0]))
