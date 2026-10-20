@@ -1,7 +1,7 @@
 name: 인스타 업로드
 on:
   schedule:
-    - cron: "7 * * * *"   # 매시 7분, 시간이 된 게시물 확인
+    - cron: "7,22,37,52 * * * *"   # 15분마다 확인 (깃허브 예약이 자주 밀려서 촘촘하게)
   workflow_dispatch:
     inputs:
       only_post:
