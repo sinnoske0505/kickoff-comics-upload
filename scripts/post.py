@@ -196,15 +196,27 @@ def share_story(uid, image_url):
         c = call("POST", f"{uid}/media", image_url=image_url, media_type="STORIES")["id"]
         wait_ready(c)
         call("POST", f"{uid}/media_publish", creation_id=c)
-        print("스토리 공유 완료")
         return True
     except Exception as e:
-        print("스토리 공유 건너뜀:", str(e)[:200])
+        print("스토리 실패:", str(e)[:200])
         return False
 
 
+def share_stories(uid, urls):
+    """장면별 스토리를 순서대로 올림. 하나라도 실패하면 거기서 멈춤."""
+    n = 0
+    for u in urls:
+        if not share_story(uid, u):
+            break
+        n += 1
+        time.sleep(5)
+    return n
+
+
 def publish(folder):
-    imgs = sorted(glob.glob(f"{folder}/*.jpg"), key=lambda p: int(os.path.basename(p).split(".")[0]))
+    imgs = sorted([p for p in glob.glob(f"{folder}/*.jpg") if os.path.basename(p).split(".")[0].isdigit()],
+                  key=lambda p: int(os.path.basename(p).split(".")[0]))
+    stories = sorted(glob.glob(f"{folder}/story_*.jpg"), key=lambda p: int(re.findall(r"\d+", os.path.basename(p))[0]))
     caption = clean_caption(open(f"{folder}/caption.txt", encoding="utf-8").read())
     collab = []
     if os.path.exists(f"{folder}/collab.txt"):
@@ -237,7 +249,9 @@ def publish(folder):
         notes.append("첫 댓글 완료")
     except Exception as e:
         notes.append(f"첫 댓글 실패: {str(e)[:120]}")
-    notes.append("스토리 공유 완료" if share_story(uid, url(imgs[0])) else "스토리 공유 건너뜀")
+    story_urls = [url(p) for p in stories] or [url(imgs[0])]
+    n = share_stories(uid, story_urls)
+    notes.append(f"스토리 {n}/{len(story_urls)}장 완료" if n else "스토리 건너뜀")
     with open(f"{folder}/posted.txt", "a") as f:
         f.write("# " + " / ".join(notes) + "\n")
     print(" / ".join(notes))
