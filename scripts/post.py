@@ -250,7 +250,7 @@ def share_stories(uid, paths):
     return n
 
 
-REEL_COMMENT = "📖 Full 4-panel comic + MOTM vote are on our feed. Tap @kick_off_comics 👆"
+REEL_COMMENT = "📖 Full comic + MOTM vote are on our feed. Tap @kick_off_comics 👆"
 
 
 def publish_reel(folder):
