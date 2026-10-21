@@ -7,6 +7,9 @@ on:
       only_post:
         description: "바로 올릴 posts 폴더 이름 (비우면 예약된 것만)"
         required: false
+      dry_run:
+        description: "1이면 게시하지 않고 형식만 점검"
+        required: false
 permissions:
   contents: write
 jobs:
@@ -20,6 +23,7 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           ONLY_POST: ${{ github.event.inputs.only_post }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: python scripts/post.py
       - name: 게시 기록 저장
         run: |

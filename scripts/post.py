@@ -23,6 +23,7 @@ TOKEN = os.environ["IG_TOKEN"]
 REPO = os.environ.get("GITHUB_REPOSITORY", "sinnoske0505/kickoff-comics-upload")
 BRANCH = os.environ.get("GITHUB_REF_NAME", "main")
 ONLY = os.environ.get("ONLY_POST", "").strip()
+DRY = os.environ.get("DRY_RUN", "").strip().lower() in ("1", "true", "yes")  # 컨테이너만 만들고 게시는 안 함 (비율·형식 점검용)
 KST = datetime.timezone(datetime.timedelta(hours=9))
 MAX_TAGS = 5
 DISCLAIMER = "Fan-made comic. Not affiliated with any club, league or player."
@@ -297,6 +298,13 @@ def publish(folder):
             wait_ready(k); kids.append(k)
         c = make_parent(uid, collab, media_type="CAROUSEL", children=",".join(kids), caption=caption, is_ai_generated="true")
     wait_ready(c)
+    if DRY:
+        print(f"점검 통과: 이미지 {len(imgs)}장 컨테이너 준비 완료 (게시 안 함)")
+        for sp in stories:
+            sc = with_hosts(lambda u: call("POST", f"{uid}/media", image_url=u, media_type="STORIES")["id"], sp)
+            wait_ready(sc)
+        print(f"점검 통과: 스토리 {len(stories)}장 컨테이너 준비 완료 (게시 안 함)")
+        return
     res = call("POST", f"{uid}/media_publish", creation_id=c)
     mid = res["id"]
     link = call("GET", mid, fields="permalink").get("permalink", "")
