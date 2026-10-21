@@ -337,6 +337,7 @@ def publish(folder):
 
 now = datetime.datetime.now(KST)
 done = 0
+failed = False
 for folder in sorted(glob.glob("posts/*/")):
     folder = folder.rstrip("/")
     if os.path.exists(f"{folder}/posted.txt"):
@@ -349,5 +350,13 @@ for folder in sorted(glob.glob("posts/*/")):
             print("대기:", folder, t); continue
     elif not ONLY:
         continue  # 시간 없는 폴더는 직접 실행할 때만
-    publish(folder); done += 1
+    try:
+        publish(folder); done += 1
+    except Exception as e:
+        with open(f"{folder}/error.txt", "w", encoding="utf-8") as f:
+            f.write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} {type(e).__name__}: {str(e)[:1500]}\n")
+        print("게시 실패:", e)
+        failed = True
 print("이번 실행 게시 수:", done)
+if failed:
+    sys.exit(1)
