@@ -1,7 +1,7 @@
 """킥오프코믹스 인스타 자동 업로드.
 
 posts/<폴더>/ 안에
-  1.jpg, 2.jpg ...      캐러셀 이미지 (순서대로)
+  1.jpg, 2.jpg ...      캐러셀 이미지 (순서대로, 3:4 1080x1440 한 컷씩 + 마지막 투표 카드)
   caption.txt           캡션
   post_at.txt           (선택) 한국시간 'YYYY-MM-DD HH:MM'
   alt.txt               (선택) 이미지별 대체 텍스트, 한 줄에 하나
@@ -104,7 +104,7 @@ def candidates(caption):
 
 def headline(caption):
     first = caption.split("\n", 1)[0]
-    return re.split(r"\s+in 4 panels", first)[0].strip()
+    return re.split(r"\s+in \d+ panels", first)[0].strip()
 
 
 # ---------- 지난 편 투표 집계 ----------
@@ -172,7 +172,8 @@ def alt_texts(folder, imgs, caption):
         alts = [l.strip() for l in open(p, encoding="utf-8").read().split("\n") if l.strip()]
     else:
         h = headline(caption)
-        alts = [f"Four-panel chibi football comic: {h}.", f"Man of the Match vote card: {h}."]
+        n = len(imgs) - 1  # 마지막 장은 투표 카드
+        alts = [f"Panel {i + 1} of {n}, chibi football comic: {h}." for i in range(n)] + [f"Vote card: {h}."]
     return [(alts[i] if i < len(alts) else alts[-1])[:1000] for i in range(len(imgs))]
 
 
