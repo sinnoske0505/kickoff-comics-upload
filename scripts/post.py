@@ -221,6 +221,14 @@ def make_parent(uid, collab, **params):
 
 
 def share_story(uid, path):
+    if _share_story_once(uid, path):
+        return True
+    print("스토리 30초 뒤 다시 시도:", path)
+    time.sleep(30)
+    return _share_story_once(uid, path)
+
+
+def _share_story_once(uid, path):
     try:
         c = with_hosts(lambda u: call("POST", f"{uid}/media", image_url=u, media_type="STORIES")["id"], path)
         wait_ready(c)
@@ -280,6 +288,13 @@ def publish(folder):
     imgs = sorted([p for p in glob.glob(f"{folder}/*.jpg") if os.path.basename(p).split(".")[0].isdigit()],
                   key=lambda p: int(os.path.basename(p).split(".")[0]))
     stories = sorted(glob.glob(f"{folder}/story_*.jpg"), key=lambda p: int(re.findall(r"\d+", os.path.basename(p))[0]))
+    if not imgs and stories:
+        # 스토리만 있는 폴더 = 빠진 스토리 다시 올리기 (피드 게시 없음)
+        me = call("GET", "me", fields="user_id,username")
+        n = share_stories(me["user_id"], stories)
+        open(f"{folder}/posted.txt", "w").write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} stories-only\n# 스토리 {n}/{len(stories)}장 완료\n")
+        print(f"스토리만: {n}/{len(stories)}장")
+        return
     caption = clean_caption(open(f"{folder}/caption.txt", encoding="utf-8").read())
     collab = []
     if os.path.exists(f"{folder}/collab.txt"):
