@@ -360,6 +360,16 @@ for folder in sorted(glob.glob("posts/*/")):
             print("대기:", folder, t); continue
     elif not ONLY:
         continue  # 시간 없는 폴더는 직접 실행할 때만
+    if not ONLY and os.path.exists(f"{folder}/error.txt"):
+        # 실패한 폴더는 바로 재시도하지 않음 (인스타 차단이 길어지는 것 방지)
+        err = open(f"{folder}/error.txt", encoding="utf-8").read()
+        try:
+            et = datetime.datetime.strptime(err[:16], "%Y-%m-%d %H:%M").replace(tzinfo=KST)
+        except ValueError:
+            et = now
+        wait_h = 6 if ("request limit" in err or "blocked" in err) else 1
+        if now - et < datetime.timedelta(hours=wait_h):
+            print("실패 후 대기:", folder, f"{wait_h}시간"); continue
     try:
         publish(folder); done += 1
     except Exception as e:
