@@ -265,8 +265,18 @@ def publish_reel(folder):
     def go(u):
         return call("POST", f"{uid}/media", media_type="REELS", video_url=u, caption=caption,
                     share_to_feed="true", thumb_offset=str(cover_ms), is_ai_generated="true")["id"]
-    c = with_hosts(go, f"{folder}/reel.mp4")
-    wait_ready(c, tries=60)   # 영상 처리는 최대 10분까지 기다림
+    # 영상은 GitHub raw 먼저, 처리 오류(ERROR)면 다른 주소로 다시 시도 (jsDelivr가 큰 영상을 못 주는 경우 대비)
+    c, last = None, None
+    for h in (HOSTS[1], HOSTS[0]):
+        try:
+            c = go(h(f"{folder}/reel.mp4"))
+            wait_ready(c, tries=60)   # 영상 처리는 최대 10분까지 기다림
+            break
+        except (RuntimeError, ApiError) as e:
+            print("영상 주소 바꿔서 다시 시도:", str(e)[:150]); last = e; c = None
+            time.sleep(5)
+    if c is None:
+        raise last
     res = call("POST", f"{uid}/media_publish", creation_id=c)
     mid = res["id"]
     link = call("GET", mid, fields="permalink").get("permalink", "")
