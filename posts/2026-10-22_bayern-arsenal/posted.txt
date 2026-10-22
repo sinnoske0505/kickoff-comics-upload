@@ -1,0 +1,2 @@
+2026-10-22 15:32 https://www.instagram.com/p/DeyVwo2FQbR/
+# 수동 실행(15:26)으로 게시됨. 봇이 posted.txt를 남기지 않아 프로필에서 링크 확인 후 수동 기록 (중복 게시 방지)
