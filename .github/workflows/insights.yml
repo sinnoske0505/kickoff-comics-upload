@@ -3,6 +3,8 @@ on:
   schedule:
     - cron: "37 9 * * 2"   # 매주 화요일 18:37 KST (화요일 주간 작업 전에)
   workflow_dispatch:
+  push:
+    paths: ["scripts/insights.py"]   # 분석 스크립트를 고치면 바로 한 번 돌려 봄
 permissions:
   contents: write
 jobs:
