@@ -55,6 +55,28 @@ def call(method, path, **params):
         raise ApiError(f"[{method} {step}] {body}")
 
 
+def publish_verified(uid, creation_id, caption):
+    """media_publish. 10/23부터 인스타가 '2207051 / request limit' 오류를 주면서도 실제로는 게시하는 경우가 있음
+    → 오류가 나면 최근 게시물을 확인해 같은 캡션이 방금 올라갔으면 성공으로 처리 (중복 게시 방지)."""
+    try:
+        return call("POST", f"{uid}/media_publish", creation_id=creation_id)
+    except ApiError as e:
+        if "2207051" not in str(e) and "request limit" not in str(e):
+            raise
+        head = caption.strip()[:60]
+        for wait in (15, 30, 60):
+            time.sleep(wait)
+            try:
+                recent = call("GET", "me/media", fields="id,caption,timestamp", limit=5).get("data", [])
+            except ApiError:
+                continue
+            for m in recent:
+                if (m.get("caption") or "").strip()[:60] == head:
+                    print("오류가 났지만 실제로 게시됨 → 성공 처리:", m["id"])
+                    return {"id": m["id"]}
+        raise
+
+
 def wait_ready(cid, tries=30):
     for _ in range(tries):
         s = call("GET", cid, fields="status_code").get("status_code")
@@ -238,7 +260,7 @@ def _share_story_once(uid, path):
     try:
         c = with_hosts(lambda u: call("POST", f"{uid}/media", image_url=u, media_type="STORIES")["id"], path)
         wait_ready(c)
-        call("POST", f"{uid}/media_publish", creation_id=c)
+        publish_verified(uid, c, caption)
         return True
     except Exception as e:
         print("스토리 실패:", str(e)[:200])
@@ -283,7 +305,7 @@ def publish_reel(folder):
             time.sleep(5)
     if c is None:
         raise last
-    res = call("POST", f"{uid}/media_publish", creation_id=c)
+    res = publish_verified(uid, c, caption)
     mid = res["id"]
     link = call("GET", mid, fields="permalink").get("permalink", "")
     open(f"{folder}/posted.txt", "w").write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} {link} id={mid} type=reel\n")
@@ -331,7 +353,7 @@ def publish(folder):
             wait_ready(k); kids.append(k)
         c = make_parent(uid, collab, media_type="CAROUSEL", children=",".join(kids), caption=caption, is_ai_generated="true")
     wait_ready(c)
-    res = call("POST", f"{uid}/media_publish", creation_id=c)
+    res = publish_verified(uid, c, caption)
     mid = res["id"]
     link = call("GET", mid, fields="permalink").get("permalink", "")
     open(f"{folder}/posted.txt", "w").write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} {link} id={mid}\n")

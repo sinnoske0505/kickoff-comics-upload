@@ -1,0 +1,2 @@
+2026-10-23 22:14 https://www.instagram.com/kick_off_comics/ (프로필 맨 앞, 수동 확인)
+# 봇은 media_publish 오류(2207051)로 기록했지만 실제 게시됨. 업로드만 모드(댓글·스토리 없음)
