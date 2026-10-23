@@ -1,4 +1,0 @@
-2026-10-23 18:52 KST — 자동 게시(API media_publish)만 차단, 앱 직접 게시는 됨 (현승님 18:47 확인, 신원 확인 완료)
-오류: [POST media_publish] code 4 / 2207051 "Application request limit reached / action is blocked"
-03:01, 04:07, 10:23, 14:33, 17:02, 18:50 여섯 번. 이미지 등록(media)은 됨, 게시(media_publish)에서 막힘.
-다음 시험: 10/24 09:30 KST 1회(예약됨). 그 전까지 다른 채팅·정시 업로드 예약은 dispatch·재시도 금지.
