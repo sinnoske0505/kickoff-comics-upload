@@ -1,13 +1,24 @@
 name: 연결 테스트
 on:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: 인스타 계정 확인 (게시 안 함)
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
         run: |
-          curl -s "https://graph.instagram.com/v23.0/me?fields=user_id,username,account_type&access_token=${IG_TOKEN}" | python3 -c "import sys,json;d=json.load(sys.stdin);print('계정:',d.get('username'),'| 유형:',d.get('account_type'),'| 오류:',d.get('error',{}).get('message','없음'))"
-          curl -s "https://graph.instagram.com/v23.0/me/content_publishing_limit?access_token=${IG_TOKEN}" | python3 -c "import sys,json;print('게시 한도:',json.load(sys.stdin))"
+          mkdir -p logs
+          {
+            echo "확인 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+            curl -s "https://graph.instagram.com/v23.0/me?fields=user_id,username,account_type&access_token=${IG_TOKEN}" | python3 -c "import sys,json;d=json.load(sys.stdin);d.pop('id',None);print('계정:',json.dumps(d,ensure_ascii=False))"
+            curl -s "https://graph.instagram.com/v23.0/me/content_publishing_limit?fields=config,quota_usage&access_token=${IG_TOKEN}" | python3 -c "import sys;print('게시 한도:',sys.stdin.read())"
+          } > logs/check.txt
+          cat logs/check.txt
+          git config user.name "kickoff-bot"; git config user.email "bot@users.noreply.github.com"
+          git add logs/check.txt
+          git diff --cached --quiet || (git commit -m "연결 테스트 결과" && for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done)
