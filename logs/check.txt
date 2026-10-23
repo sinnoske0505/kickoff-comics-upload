@@ -1,0 +1,3 @@
+확인 시각: 2026-10-23 16:58
+계정: {"user_id": "17841417593825374", "username": "kick_off_comics", "account_type": "MEDIA_CREATOR"}
+게시 한도: {"data":[{"config":{"quota_total":100,"quota_duration":86400},"quota_usage":10}]}
