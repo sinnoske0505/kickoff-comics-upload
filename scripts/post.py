@@ -45,8 +45,9 @@ def call(method, path, **params):
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:500]
-        print("API 오류:", e.code, body)
-        raise ApiError(body)
+        step = path.split("/")[-1] if "/" in path else path
+        print("API 오류:", method, step, e.code, body)
+        raise ApiError(f"[{method} {step}] {body}")
 
 
 def wait_ready(cid, tries=30):
