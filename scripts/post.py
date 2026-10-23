@@ -33,6 +33,11 @@ class ApiError(Exception):
     pass
 
 
+# 10/23 인스타가 자동 게시를 막음 → 게시(업로드)만 하고 첫 댓글·투표 집계·스토리는 끔.
+# 다시 켜려면 워크플로 env에 POST_EXTRAS: "1"
+EXTRAS = os.environ.get("POST_EXTRAS", "0") == "1"
+
+
 def call(method, path, **params):
     params["access_token"] = TOKEN
     data = urllib.parse.urlencode(params).encode()
@@ -283,11 +288,13 @@ def publish_reel(folder):
     link = call("GET", mid, fields="permalink").get("permalink", "")
     open(f"{folder}/posted.txt", "w").write(f"{datetime.datetime.now(KST):%Y-%m-%d %H:%M} {link} id={mid} type=reel\n")
     print("릴스 게시 완료:", link)
-    try:
-        call("POST", f"{mid}/comments", message=REEL_COMMENT)
-        note = "첫 댓글 완료"
-    except Exception as e:
-        note = f"첫 댓글 실패: {str(e)[:120]}"
+    note = "업로드만 (첫 댓글 끔)"
+    if EXTRAS:
+        try:
+            call("POST", f"{mid}/comments", message=REEL_COMMENT)
+            note = "첫 댓글 완료"
+        except Exception as e:
+            note = f"첫 댓글 실패: {str(e)[:120]}"
     with open(f"{folder}/posted.txt", "a") as f:
         f.write("# " + note + "\n")
     print(note)
@@ -332,6 +339,12 @@ def publish(folder):
 
     # 게시 후 자동 작업 (실패해도 게시는 이미 끝남)
     notes = []
+    if not EXTRAS:
+        notes.append("업로드만 (첫 댓글·투표 집계·스토리 끔)")
+        with open(f"{folder}/posted.txt", "a") as f:
+            f.write("# " + " / ".join(notes) + "\n")
+        print(" / ".join(notes))
+        return
     try:
         msg = first_comment(folder, caption)
         call("POST", f"{mid}/comments", message=msg)

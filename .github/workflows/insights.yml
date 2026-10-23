@@ -1,10 +1,10 @@
 name: 성과 분석
 on:
-  schedule:
-    - cron: "37 9 * * 2"   # 매주 화요일 18:37 KST (화요일 주간 작업 전에)
+  # schedule:  (10/23 자동 활동 줄이기 위해 끔 — 필요할 때 수동 실행)
+    # - cron: "37 9 * * 2"
   workflow_dispatch:
-  push:
-    paths: ["scripts/insights.py"]   # 분석 스크립트를 고치면 바로 한 번 돌려 봄
+  # push:
+    # paths: ["scripts/insights.py"]
 permissions:
   contents: write
 jobs:
