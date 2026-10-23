@@ -260,7 +260,7 @@ def _share_story_once(uid, path):
     try:
         c = with_hosts(lambda u: call("POST", f"{uid}/media", image_url=u, media_type="STORIES")["id"], path)
         wait_ready(c)
-        publish_verified(uid, c, caption)
+        call("POST", f"{uid}/media_publish", creation_id=c)
         return True
     except Exception as e:
         print("스토리 실패:", str(e)[:200])
