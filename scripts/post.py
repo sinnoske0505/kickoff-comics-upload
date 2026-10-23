@@ -247,7 +247,7 @@ def share_stories(uid, paths):
         if not share_story(uid, u):
             break
         n += 1
-        time.sleep(5)
+        time.sleep(40)  # 연달아 올리면 스팸 판정 위험 (10/23 계정 제한 후)
     return n
 
 
@@ -339,6 +339,10 @@ def publish(folder):
     except Exception as e:
         notes.append(f"첫 댓글 실패: {str(e)[:120]}")
     story_paths = stories or [imgs[0]]
+    max_st = int(os.environ.get("MAX_STORIES", "3"))  # 10/23 계정 제한 후 스토리 수 줄임
+    if len(story_paths) > max_st:
+        idx = sorted({0, len(story_paths) // 2, len(story_paths) - 1})[:max_st]
+        story_paths = [story_paths[i] for i in idx]
     n = share_stories(uid, story_paths)
     notes.append(f"스토리 {n}/{len(story_paths)}장 완료" if n else "스토리 건너뜀")
     with open(f"{folder}/posted.txt", "a") as f:
