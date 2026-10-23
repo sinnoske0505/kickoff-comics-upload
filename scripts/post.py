@@ -346,6 +346,10 @@ def publish(folder):
 
 
 now = datetime.datetime.now(KST)
+if os.path.exists("posts/HOLD.txt"):
+    # 인스타 계정 차단 등으로 모든 게시를 멈춤 (수동 실행 포함). 풀려면 posts/HOLD.txt 삭제
+    print("게시 중지(HOLD):", open("posts/HOLD.txt", encoding="utf-8").read())
+    sys.exit(0)
 done = 0
 failed = False
 for folder in sorted(glob.glob("posts/*/")):
