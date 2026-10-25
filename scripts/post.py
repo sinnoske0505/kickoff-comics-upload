@@ -290,9 +290,16 @@ def publish_reel(folder):
     if os.path.exists(f"{folder}/cover_ms.txt"):
         cover_ms = int(open(f"{folder}/cover_ms.txt").read().strip())
 
+    cover = f"{folder}/cover.jpg" if os.path.exists(f"{folder}/cover.jpg") else None
+
     def go(u):
-        return call("POST", f"{uid}/media", media_type="REELS", video_url=u, caption=caption,
-                    share_to_feed="true", thumb_offset=str(cover_ms), is_ai_generated="true")["id"]
+        base = dict(media_type="REELS", video_url=u, caption=caption, share_to_feed="true", is_ai_generated="true")
+        if cover:
+            try:
+                return call("POST", f"{uid}/media", cover_url=HOSTS[1](cover), **base)["id"]
+            except ApiError as e:
+                print("표지 이미지로 실패 → 영상 프레임 표지로 다시:", str(e)[:150])
+        return call("POST", f"{uid}/media", thumb_offset=str(cover_ms), **base)["id"]
     # 영상은 GitHub raw 먼저, 처리 오류(ERROR)면 다른 주소로 다시 시도 (jsDelivr가 큰 영상을 못 주는 경우 대비)
     c, last = None, None
     for h in (HOSTS[1], HOSTS[0]):
