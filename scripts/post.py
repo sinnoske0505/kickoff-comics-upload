@@ -291,9 +291,11 @@ def publish_reel(folder):
         cover_ms = int(open(f"{folder}/cover_ms.txt").read().strip())
 
     cover = f"{folder}/cover.jpg" if os.path.exists(f"{folder}/cover.jpg") else None
+    # 10/30 현승님: "릴스는 그리드에 표시하지 않는 걸로" → 기본 share_to_feed=false. 폴더에 grid.txt가 있으면 그 편만 그리드에도 표시.
+    share = "true" if os.path.exists(f"{folder}/grid.txt") else "false"
 
     def go(u):
-        base = dict(media_type="REELS", video_url=u, caption=caption, share_to_feed="true", is_ai_generated="true")
+        base = dict(media_type="REELS", video_url=u, caption=caption, share_to_feed=share, is_ai_generated="true")
         if cover:
             try:
                 return call("POST", f"{uid}/media", cover_url=HOSTS[1](cover), **base)["id"]
