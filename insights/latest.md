@@ -1,6 +1,6 @@
-# 킥오프코믹스 성과 (2026-11-18 KST)
+# 킥오프코믹스 성과 (2026-11-19 KST)
 
-팔로워 5 · 게시물 48
+팔로워 5 · 게시물 49
 
 순위 기준: 평소 대비 배수(outlier, 같은 종류 중앙값 대비) → 보내기/도달. 조회수 자체는 참고만.
 
@@ -17,8 +17,9 @@
 | REELS | [2026-11-12_italy-france-reel](https://www.instagram.com/reel/DfqcavLjA0h/) | 2026-11-13 | 275 | 249 | 1.83 | 0.0 | 0.0 | - | 0 | 5394 |
 | REELS | [2026-11-07_arsenal-hull-reel](https://www.instagram.com/reel/Dfc_u52DBvD/) | 2026-11-07 | 249 | 226 | 1.66 | 0.0 | 0.0 | - | 0 | 9840 |
 | REELS | [2026-11-08_sunderland-chelsea-reel](https://www.instagram.com/reel/Dffn7_bAAXZ/) | 2026-11-08 | 220 | 196 | 1.47 | 0.0 | 0.0 | - | 0 | 9490 |
-| REELS | [2026-11-16_germany-netherlands-reel](https://www.instagram.com/reel/Df0gM3MkdOT/) | 2026-11-16 | 204 | 182 | 1.36 | 0.0 | 0.0 | - | 0 | 8692 |
+| REELS | [2026-11-16_germany-netherlands-reel](https://www.instagram.com/reel/Df0gM3MkdOT/) | 2026-11-16 | 210 | 188 | 1.4 | 0.0 | 0.0 | - | 0 | 8904 |
 | REELS | [2026-11-08_atletico-barcelona-reel](https://www.instagram.com/reel/DfgFHHmgEFj/) | 2026-11-09 | 150 | 141 | 1.0 | 0.0 | 0.0 | - | 0 | 4490 |
+| REELS | [2026-11-17_wales-portugal-reel](https://www.instagram.com/reel/Df3GOFgFevu/) | 2026-11-17 | 133 | 121 | 0.89 | 0.0 | 0.0 | - | 0 | 7625 |
 | REELS | [2026-11-11_pochettino-manutd-reel](https://www.instagram.com/reel/DfmdVxUE01D/) | 2026-11-11 | 131 | 121 | 0.87 | 0.0 | 0.0 | - | 0 | 6577 |
 | REELS | [2026-11-05_palace-hoffenheim-reel](https://www.instagram.com/reel/DfYMH_rEugW/) | 2026-11-05 | 130 | 122 | 0.87 | 0.0 | 0.0 | - | 0 | 4313 |
 | REELS | [2026-11-01_liverpool-arsenal-reel](https://www.instagram.com/reel/DfTUNpRAjKg/) | 2026-11-04 | 128 | 115 | 0.85 | 0.0 | 0.0 | - | 0 | 5266 |
@@ -28,9 +29,9 @@
 | REELS | [2026-11-04_leipzig-mancity-reel](https://www.instagram.com/reel/DfVtk0sjT23/) | 2026-11-05 | 115 | 105 | 0.77 | 0.0 | 0.0 | - | 0 | 3455 |
 | REELS | [2026-11-05_ronaldo-retires-reel](https://www.instagram.com/reel/DfXKySlD2_v/) | 2026-11-05 | 112 | 105 | 0.75 | 0.0 | 0.0 | - | 0 | 5306 |
 | REELS | [2026-10-31_chelsea-manutd-reel-v2](https://www.instagram.com/reel/DfQ350iG24a/) | 2026-11-03 | 112 | 105 | 0.75 | 0.0 | 0.0 | - | 0 | 6029 |
-| REELS | [2026-10-31_villa-fulham-reel](https://www.instagram.com/reel/DfLaut8CcbQ/) | 2026-11-01 | 113 | 109 | 0.75 | 0.0 | 0.0 | - | 0 | 5217 |
 | REELS | [2026-11-13_pochettino-official-reel](https://www.instagram.com/reel/Dfr46-HjGZM/) | 2026-11-13 | 109 | 96 | 0.73 | 0.0 | 0.0 | - | 0 | 5294 |
 | REELS | [2026-11-12_carrick-sacked-reel](https://www.instagram.com/reel/DfpMIGeCkz3/) | 2026-11-12 | 109 | 99 | 0.73 | 0.0 | 0.0 | - | 0 | 6119 |
+| CAROUSEL_ALBUM | [2026-11-17_wales-portugal](https://www.instagram.com/p/Df2-_MSCTgN/) | 2026-11-17 | 2 | 1 | - | 0.0 | 0.0 | 0.0 | 0 | - |
 | CAROUSEL_ALBUM | [2026-11-16_germany-netherlands](https://www.instagram.com/p/Df0Yx9zidYw/) | 2026-11-16 | 0 | 0 | - | - | - | - | 0 | - |
 | CAROUSEL_ALBUM | [2026-11-13_netherlands-greece](https://www.instagram.com/p/DfsqezxIzFB/) | 2026-11-13 | 0 | 0 | - | - | - | - | 0 | - |
 | CAROUSEL_ALBUM | [2026-11-13_pochettino-official](https://www.instagram.com/p/DfrtzMFIIqu/) | 2026-11-13 | 1 | 1 | - | 0.0 | 0.0 | 0.0 | 0 | - |
@@ -55,4 +56,3 @@
 | CAROUSEL_ALBUM | [2026-11-03_manutd-roma](https://www.instagram.com/p/DfTNAoIibS5/) | 2026-11-04 | 1 | 1 | - | 0.0 | 0.0 | 0.0 | 0 | - |
 | CAROUSEL_ALBUM | [2026-11-02_newcastle-everton](https://www.instagram.com/p/DfRGTHXDsmJ/) | 2026-11-03 | 0 | 0 | - | - | - | - | 0 | - |
 | CAROUSEL_ALBUM | [2026-11-01_liverpool-arsenal](https://www.instagram.com/p/DfQ_Vg5FjFJ/) | 2026-11-03 | 0 | 0 | - | - | - | - | 0 | - |
-| CAROUSEL_ALBUM | [2026-10-31_villa-fulham](https://www.instagram.com/p/DfLTik-lg7v/) | 2026-10-31 | 0 | 0 | - | - | - | - | 0 | - |
