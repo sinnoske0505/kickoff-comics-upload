@@ -20,7 +20,9 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           ONLY_POST: ${{ github.event.inputs.only_post }}
-        run: python scripts/post.py
+        run: |
+          pip install -q pillow
+          python scripts/post.py
       - name: 게시 기록 저장
         if: always()
         run: |

@@ -281,6 +281,22 @@ def share_stories(uid, paths):
 REEL_COMMENT = "📖 Full comic + MOTM vote are on our feed. Tap @kick_off_comics 👆"
 
 
+def check_reel_cover(cover):
+    """11/26 현승님 "릴스 썸네일이 기존과 달라, 이 문제 계속 발생": 릴스 표지는 reelcover.py 공식 틀만.
+    cover.jpg 없음 / 1080x1920 아님 / 위·아래가 단색 띠(피드 표지를 붙여 만든 것)면 게시 중단."""
+    if not cover:
+        raise SystemExit("릴스 cover.jpg 없음 → 00_브랜드/reelcover.py로 만들 것")
+    try:
+        from PIL import Image, ImageStat
+    except ImportError:
+        print("PIL 없음 → 표지 검사 건너뜀"); return
+    im = Image.open(cover).convert("L")
+    if im.size != (1080, 1920):
+        raise SystemExit(f"릴스 표지 크기 {im.size} ≠ 1080x1920 → reelcover.py로 다시")
+    for box in ((0, 0, 1080, 200), (0, 1720, 1080, 1920)):
+        if ImageStat.Stat(im.crop(box)).stddev[0] < 6:
+            raise SystemExit("릴스 표지 위/아래가 단색 띠 → 피드 표지가 아니라 reelcover.py 틀로 다시")
+
 def publish_reel(folder):
     """reel.mp4 가 있는 폴더 = 릴스. 음악은 영상 파일 안에 미리 넣어 둠 (API로는 인스타 음악을 못 붙임)."""
     caption = clean_caption(open(f"{folder}/caption.txt", encoding="utf-8").read())
@@ -291,6 +307,7 @@ def publish_reel(folder):
         cover_ms = int(open(f"{folder}/cover_ms.txt").read().strip())
 
     cover = f"{folder}/cover.jpg" if os.path.exists(f"{folder}/cover.jpg") else None
+    check_reel_cover(cover)
     # 10/30 현승님: "릴스는 그리드에 표시하지 않는 걸로" → 기본 share_to_feed=false. 폴더에 grid.txt가 있으면 그 편만 그리드에도 표시.
     share = "true" if os.path.exists(f"{folder}/grid.txt") else "false"
 
