@@ -3,7 +3,8 @@ usage: python3 build.py cfg.json   (cfg 폴더 기준 상대경로)
 cfg = {"font":"Bangers.ttf","music":"music.mp3","out":"reel.mp4","hook":["LINE1","LINE2"],
        "cuts":[{"clip":"clips/c1.mp4","wav":"n1.wav","disp":"TEXT|CHUNK...","goal":0.4,"score":"1-0",
                 "board":["MCI 0-0 NAP","MCI 0-1 NAP","55'"], "ss":0, "slow":1.0, "dur":null}, ...]}
-- 첫 컷은 hook 두 줄(흰/노랑) 표시, disp 없음.
+- 첫 컷은 hook 두 줄(흰/노랑) 표시, disp 없음. hook_y=[y1,y2]로 위치 변경.
+- 컷별 cy = 팝 자막 y(기본 1330). **자막·훅이 핵심 인물 얼굴을 가리면 안 됨(11/25 현승님)** → 빌드 후 audit(컷별 2초 프레임) 확인.
 - clip 앞부분 ss초부터, slow배 느리게(setpts), dur초만 사용(없으면 끝까지 + 마지막 프레임 정지).
 - goal 초에 펀치인·흔들림·흰 플래시·노랑 점수 팝, board는 위쪽 고정 스코어보드(goal 전/후 문구 + 분).
 """
@@ -39,7 +40,7 @@ for i, c in enumerate(cuts):
             if txt: vf.append(f"drawtext=fontfile={FONT}:text='{esc(txt)}':fontsize=64:fontcolor=white:x=(w-tw)/2-40:y=190:enable='{en}'")
         if mn: vf.append(f"drawtext=fontfile={FONT}:text='{esc(mn)}':fontsize=54:fontcolor=0xFFD400:x=725:y=198")
     if n == 1:
-        for k, (txt, y) in enumerate(zip(C['hook'], (300, 420))):
+        for k, (txt, y) in enumerate(zip(C['hook'], C.get('hook_y', (300, 420)))):
             fs = f"100+40*max(0\\,1-(t-{0.15+k*1.2})/0.15)"
             vf.append(f"drawtext=fontfile={FONT}:text='{esc(txt)}':fontsize='{fs}':fontcolor={'white' if k==0 else '0xFFD400'}:borderw=9:bordercolor=black:x=(w-tw)/2:y={y}:enable='gte(t\\,{0.15+k*1.2})'")
     elif c.get('disp'):
@@ -55,7 +56,7 @@ for i, c in enumerate(cuts):
         for x in chunks:
             txt = ' '.join(x); dd = nd * len(txt) / tot; last = (n == N and x is chunks[-1])
             fs = f"90+34*max(0\\,1-(t-{t0:.2f})/0.12)"
-            vf.append(f"drawtext=fontfile={FONT}:text='{esc(txt)}':fontsize='{fs}':fontcolor=white:borderw=8:bordercolor=black:x=(w-tw)/2:y=1330:enable='between(t\\,{t0:.2f}\\,{t0+dd+(1.2 if last else 0):.2f})'")
+            vf.append(f"drawtext=fontfile={FONT}:text='{esc(txt)}':fontsize='{fs}':fontcolor=white:borderw=8:bordercolor=black:x=(w-tw)/2:y={c.get('cy',1330)}:enable='between(t\\,{t0:.2f}\\,{t0+dd+(1.2 if last else 0):.2f})'")
             t0 += dd
     out = f'seg/s{n}.mp4'
     subprocess.run(['ffmpeg','-nostdin','-y','-loglevel','error','-i',c['clip'],'-i',c['wav'],'-filter_complex',
