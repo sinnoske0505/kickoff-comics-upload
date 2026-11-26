@@ -293,9 +293,10 @@ def check_reel_cover(cover):
     im = Image.open(cover).convert("L")
     if im.size != (1080, 1920):
         raise SystemExit(f"릴스 표지 크기 {im.size} ≠ 1080x1920 → reelcover.py로 다시")
-    for box in ((0, 0, 1080, 200), (0, 1720, 1080, 1920)):
-        if ImageStat.Stat(im.crop(box)).stddev[0] < 6:
-            raise SystemExit("릴스 표지 위/아래가 단색 띠 → 피드 표지가 아니라 reelcover.py 틀로 다시")
+    # 위·아래가 '둘 다' 단색이면 띠를 붙인 것 (공식 틀은 위가 흐린 밤하늘이라 위만 단색일 수 있음 — 75편)
+    flat = [ImageStat.Stat(im.crop(box)).stddev[0] < 6 for box in ((0, 0, 1080, 200), (0, 1720, 1080, 1920))]
+    if all(flat):
+        raise SystemExit("릴스 표지 위/아래가 단색 띠 → 피드 표지가 아니라 reelcover.py 틀로 다시")
 
 def publish_reel(folder):
     """reel.mp4 가 있는 폴더 = 릴스. 음악은 영상 파일 안에 미리 넣어 둠 (API로는 인스타 음악을 못 붙임)."""
