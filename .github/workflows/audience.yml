@@ -1,0 +1,21 @@
+name: 시청자 분포
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audience:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 시청자 분포 받기 (읽기 전용)
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python scripts/audience.py
+      - name: 결과 저장
+        run: |
+          git config user.name "kickoff-bot"; git config user.email "bot@users.noreply.github.com"
+          git add insights/audience.json
+          git diff --cached --quiet || (git commit -m "시청자 분포" && git pull --rebase && git push)
