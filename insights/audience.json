@@ -1,0 +1,83 @@
+{
+ "date": "2026-11-27T12:30:36.991410+09:00",
+ "account": {
+  "user_id": "17841417593825374",
+  "username": "kick_off_comics",
+  "followers_count": 9,
+  "id": "28626239520366515"
+ },
+ "data": {
+  "follower_demographics:lifetime:age": {
+   "data": []
+  },
+  "follower_demographics:lifetime:country": {
+   "data": []
+  },
+  "follower_demographics:lifetime:city": {
+   "data": []
+  },
+  "follower_demographics:lifetime:gender": {
+   "data": []
+  },
+  "engaged_audience_demographics:this_month:age": {
+   "data": []
+  },
+  "engaged_audience_demographics:this_month:country": {
+   "data": []
+  },
+  "engaged_audience_demographics:this_month:city": {
+   "data": []
+  },
+  "engaged_audience_demographics:this_month:gender": {
+   "data": []
+  },
+  "engaged_audience_demographics:last_90_days:age": {
+   "data": []
+  },
+  "engaged_audience_demographics:last_90_days:country": {
+   "data": []
+  },
+  "engaged_audience_demographics:last_90_days:city": {
+   "data": []
+  },
+  "engaged_audience_demographics:last_90_days:gender": {
+   "data": []
+  },
+  "reached_audience_demographics:this_month:age": {
+   "data": []
+  },
+  "reached_audience_demographics:this_month:country": {
+   "data": []
+  },
+  "reached_audience_demographics:this_month:city": {
+   "data": []
+  },
+  "reached_audience_demographics:this_month:gender": {
+   "data": []
+  },
+  "reach_30d": {
+   "data": [
+    {
+     "name": "reach",
+     "period": "day",
+     "title": "Accounts reached",
+     "description": "The number of unique accounts that have seen your content, at least once, including in ads. Content includes posts, stories, reels, videos and live videos. Reach is different from impressions, which may include multiple views of your content by the same accounts. This metric is estimated and in development.",
+     "total_value": {
+      "value": 16144
+     },
+     "id": "17841417593825374/insights/reach/day"
+    },
+    {
+     "name": "views",
+     "period": "day",
+     "title": "Views",
+     "description": "The number of times your content was played or displayed. Content includes reels, posts, stories.",
+     "total_value": {
+      "value": 19999
+     },
+     "id": "17841417593825374/insights/views/day"
+    }
+   ]
+  }
+ }
+}
