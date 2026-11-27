@@ -1,7 +1,7 @@
 name: 성과 분석
 on:
   schedule:
-    - cron: "37 9 * * 2"   # 매주 화요일 18:37 KST
+    - cron: "37 9 * * *"   # 매일 18:37 KST (11/27 현승님: 반응 보고 전략 짜기)
   workflow_dispatch:
   # push:
     # paths: ["scripts/insights.py"]
